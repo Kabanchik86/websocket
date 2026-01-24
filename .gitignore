@@ -1,0 +1,14 @@
+.idea/
+.venv/
+__pycache__/
+.env
+*.pyc
+.venv/
+*.json
+credentials.json
+Lib/
+Scripts/
+pyvenv.cfg
+.venv/
+venv/
+

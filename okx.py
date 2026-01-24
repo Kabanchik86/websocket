@@ -1,6 +1,7 @@
 import asyncio, json, time, requests, websockets
 from asyncio.exceptions import CancelledError
 
+
 # WEBSOKET OKX#############################################
 
 async def okx(prices):
@@ -28,6 +29,7 @@ async def okx(prices):
                         continue
                     # print(inform)
                     data = inform["data"][0]
+
                     ask = float(data["asks"][0][0])
                     bid = float(data["bids"][0][0])
                     volume_ask = float(data["asks"][0][1])
@@ -40,7 +42,7 @@ async def okx(prices):
                         "bid_qty": volume_bid,
                         "ts": int(data["ts"])  # OKX ts уже в мс строкой
                     })
-                    #print(prices["okx"])
+                    # print(prices["okx"])
 
         except CancelledError as e:
             print('Interrupted by user')

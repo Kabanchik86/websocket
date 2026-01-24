@@ -2,12 +2,12 @@ import asyncio, json, time, requests, websockets
 from asyncio.exceptions import CancelledError
 
 
-
 def get_bullet():
     r = requests.post("https://api.kucoin.com/api/v1/bullet-public").json()
     data = r["data"]
     server = data["instanceServers"][0]
     return data["token"], server["endpoint"], server["pingInterval"]
+
 
 async def kucoin_ws(prices):
     while True:
@@ -18,28 +18,29 @@ async def kucoin_ws(prices):
             async with websockets.connect(ws_url, ping_interval=None) as ws:
                 async def pinger():
                     while True:
-                        await asyncio.sleep(ping_ms/1000)
-                        await ws.send(json.dumps({"id": str(int(time.time()*1000)), "type":"ping"}))
+                        await asyncio.sleep(ping_ms / 1000)
+                        await ws.send(json.dumps({"id": str(int(time.time() * 1000)), "type": "ping"}))
+
                 asyncio.create_task(pinger())
                 print('Connected_kucoin')
 
                 await ws.send(json.dumps({
-                    "id": str(int(time.time()*1000)),
-                    "type":"subscribe",
-                    "topic":"/spotMarket/level2Depth5:TON-USDT",
+                    "id": str(int(time.time() * 1000)),
+                    "type": "subscribe",
+                    "topic": "/spotMarket/level2Depth5:TON-USDT",
                     "response": True
                 }))
 
                 async for msg in ws:
                     # Получаем пуши
                     inform = json.loads(msg)
-                    #print(inform)
+                    # print(inform)
                     # проверяем, что это стакан
                     if "data" not in inform or not inform["data"]:
                         continue
-                    #print(inform["data"])
+                    # print(inform["data"])
                     data = inform["data"]
-                    #print(data)
+                    # print(data)
                     ask = float(data["asks"][0][0])
                     bid = float(data["bids"][0][0])
                     volume_ask = float(data["asks"][0][1])
@@ -51,7 +52,7 @@ async def kucoin_ws(prices):
                         "bid_qty": volume_bid,
                         "ts": int(data["timestamp"])
                     })
-                    #print(prices["kucoin"])
+                    # print(prices["kucoin"])
 
 
         except CancelledError as e:
@@ -60,6 +61,5 @@ async def kucoin_ws(prices):
         except Exception as e:
             print("reconnect:", e)
             await asyncio.sleep(2)
-
 
 #asyncio.run(kucoin_ws())

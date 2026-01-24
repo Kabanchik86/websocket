@@ -1,19 +1,23 @@
-import gspread # Импортируем gspread — библиотека для работы с Google Sheets
-from google.oauth2.service_account import Credentials #Импортируем класс Credentials из Google API Используется для авторизации через файл credentials.json, который ты скачал при создании сервисного аккаунта.
+import gspread  # Импортируем gspread — библиотека для работы с Google Sheets
+from google.oauth2.service_account import \
+    Credentials  # Импортируем класс Credentials из Google API Используется для авторизации через файл credentials.json, который ты скачал при создании сервисного аккаунта.
 from datetime import datetime
 
-scopes = ['https://www.googleapis.com/auth/spreadsheets'] #Указываем область доступа (scopes) Это означает: «даю доступ к Google Sheets полностью».
-creds = Credentials.from_service_account_file('credentials.json', scopes=scopes) #Загружаем credentials.json и создаём объект creds #/etc/secrets/credentials.json
+scopes = [
+    'https://www.googleapis.com/auth/spreadsheets']  # Указываем область доступа (scopes) Это означает: «даю доступ к Google Sheets полностью».
+creds = Credentials.from_service_account_file('credentials.json',
+                                              scopes=scopes)  # Загружаем credentials.json и создаём объект creds #/etc/secrets/credentials.json
 
-client = gspread.authorize(creds) #Авторизуемся в gspread
-sheet_id = '1bUJq4hJAROo9CfcCaorSGJXo1Ecz5UgdmNpRouBBQjY' #Указываем ID твоей таблицы
-workbook = client.open_by_key(sheet_id) #Открываем саму таблицу
+client = gspread.authorize(creds)  # Авторизуемся в gspread
+sheet_id = '1bUJq4hJAROo9CfcCaorSGJXo1Ecz5UgdmNpRouBBQjY'  # Указываем ID твоей таблицы
+workbook = client.open_by_key(sheet_id)  # Открываем саму таблицу
 
 sheet1 = workbook.worksheet('отскок')
 sheet2 = workbook.worksheet('Лист2')
 sheet3 = workbook.worksheet('пробой')
 sheet4 = workbook.worksheet('fastbot')
 sheet5 = workbook.worksheet('arbitrage')
+
 
 def write_to_sheet(coin_name, sol, amount, input_mint):
     """

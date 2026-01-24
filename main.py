@@ -1,5 +1,4 @@
-import asyncio, json, time, requests, websockets
-from asyncio.exceptions import CancelledError
+import asyncio, time
 from okx import okx
 from ku_koin import kucoin_ws
 from exel import write_to_arbitrage
@@ -29,6 +28,8 @@ async def compare_loop():
         # есть ли обе котировки
         if okx["ask"] and okx["bid"] and kuc["ask"] and kuc["bid"]:
             now_ms = int(time.time() * 1000)
+            current_time = time.strftime("%H:%M:%S")
+            print(current_time)
             # print(okx['ts'])
             # print(now_ms - okx["ts"])
             # print(TTL_MS)
@@ -42,9 +43,9 @@ async def compare_loop():
 
                 if okx["ask_qty"] >= need_base and kuc["bid_qty"] >= need_base:
                     spread = (sell - buy) / buy # спред, разница между биржами
-                    if spread >= MIN_SPREAD:
+                    if spread <= MIN_SPREAD:
                         #print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
-                        write_to_arbitrage(buy, sell, spread, need_base)
+                        write_to_arbitrage(buy, sell, spread, need_base, current_time)
 
                 # Направление 2: BUY KuCoin (ask) -> SELL OKX (bid)
                 buy = kuc["ask"]
@@ -55,7 +56,7 @@ async def compare_loop():
                     spread = (sell - buy) / buy
                     if spread >= MIN_SPREAD:
                         #print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
-                        write_to_arbitrage(buy, sell, spread, need_base)
+                        write_to_arbitrage(buy, sell, spread, need_base, current_time)
 
 
         await asyncio.sleep(0.2)  # 200 мс

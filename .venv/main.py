@@ -43,7 +43,7 @@ async def compare_loop():
                 if okx["ask_qty"] >= need_base and kuc["bid_qty"] >= need_base:
                     spread = (sell - buy) / buy # спред, разница между биржами
                     if spread <= MIN_SPREAD:
-                        #print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
+                        print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
                         write_to_arbitrage(buy, sell, spread, need_base)
 
                 # Направление 2: BUY KuCoin (ask) -> SELL OKX (bid)
@@ -54,7 +54,7 @@ async def compare_loop():
                 if kuc["ask_qty"] >= need_base and okx["bid_qty"] >= need_base:
                     spread = (sell - buy) / buy
                     if spread >= MIN_SPREAD:
-                        #print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
+                        print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
                         write_to_arbitrage(buy, sell, spread, need_base)
 
 

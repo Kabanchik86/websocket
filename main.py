@@ -118,7 +118,7 @@ async def compare_loop():
 
                     if kuc["ask_qty"] >= need_base and buy_bit["bid_qty"] >= need_base:
                         spread = (sell - buy) / buy
-                        if spread <= MIN_SPREAD:
+                        if spread >= MIN_SPREAD:
                             # print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
                             write_to_arbitrage(buy, sell, spread, need_base, current_time, pair)
 

@@ -6,6 +6,7 @@ from asyncio.exceptions import CancelledError
 
 async def okx(prices):
     url = "wss://ws.okx.com:8443/ws/v5/public"
+    INSTS = ["TON-USDT", "SUI-USDT", "SOL-USDT", "APT-USDT", "NEAR-USDT", "ATOM-USDT", "AVAX-USDT"]
     while True:
         try:
             async with websockets.connect(url, ping_interval=20, ping_timeout=20) as ws:
@@ -13,12 +14,7 @@ async def okx(prices):
                 # Сообщение для подписки
                 subscribe_msg = {
                     "op": "subscribe",
-                    "args": [
-                        {
-                            "channel": "books5",
-                            "instId": "TON-USDT"
-                        }
-                    ]
+                    "args": [{"channel": "books5", "instId": inst} for inst in INSTS]
                 }
                 await ws.send(json.dumps(subscribe_msg))
                 async for msg in ws:
@@ -27,21 +23,21 @@ async def okx(prices):
                     # проверяем, что это стакан
                     if "data" not in inform or not inform["data"]:
                         continue
-                    # print(inform)
-                    data = inform["data"][0]
 
+                    instId = inform["arg"]['instId']
+                    data = inform["data"][0]
                     ask = float(data["asks"][0][0])
                     bid = float(data["bids"][0][0])
                     volume_ask = float(data["asks"][0][1])
                     volume_bid = float(data["bids"][0][1])
 
-                    prices["okx"].update({
+                    prices["okx"][instId] ={
                         "ask": ask,
                         "bid": bid,
                         "ask_qty": volume_ask,
                         "bid_qty": volume_bid,
                         "ts": int(data["ts"])  # OKX ts уже в мс строкой
-                    })
+                    }
                     # print(prices["okx"])
 
         except CancelledError as e:

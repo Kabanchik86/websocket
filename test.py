@@ -1,66 +1,37 @@
-import asyncio, json, time, requests, websockets
-from asyncio.exceptions import CancelledError
+from pybit.unified_trading import WebSocket
+import asyncio
+from time import sleep
 
-INSTS = ["TON-USDT", "SUI-USDT"]
-
-def get_bullet():
-    r = requests.post("https://api.kucoin.com/api/v1/bullet-public").json()
-    data = r["data"]
-    server = data["instanceServers"][0]
-    return data["token"], server["endpoint"], server["pingInterval"]
+INSTS = ["TONUSDT", "SUIUSDT", "APTUSDT", "NEARUSDT", "ATOMUSDT", "AVAXUSDT", "DOTUSDT", "UNIUSDT", 'PEPEUSDT']
+quote = "USDT"
 
 
-async def kucoin_ws():
+async def byu_bit():
+    ws = WebSocket(
+        testnet=False,
+        channel_type="spot",
+    )
+
+    def handle_message(message):
+        data = message['data']
+        if data['a'] and data['b']:
+            ask = data['a'][0][0]
+            bid = data['b'][0][0]
+            volume_ask = data['a'][0][1]
+            volume_bid = data['b'][0][1]
+            instId = data['s'][:-len(quote)] + "-" + quote
+            ts = message['ts']
+            print(ask, bid, volume_ask, volume_bid, instId, ts)
+
+    for inst in INSTS:
+        ws.orderbook_stream(
+            depth=1,
+            symbol=inst,
+            callback=handle_message
+        )
+
     while True:
-        try:
-            token, endpoint, ping_ms = get_bullet()
-            ws_url = f"{endpoint}?token={token}"
-
-            async with websockets.connect(ws_url, ping_interval=None) as ws:
-                async def pinger():
-                    while True:
-                        await asyncio.sleep(ping_ms / 1000)
-                        await ws.send(json.dumps({"id": str(int(time.time() * 1000)), "type": "ping"}))
-
-                asyncio.create_task(pinger())
-                print('Connected_kucoin')
-
-                for inst in INSTS:
-                    await ws.send(json.dumps({
-                        "id": str(int(time.time() * 1000)),
-                        "type": "subscribe",
-                        "topic": f"/spotMarket/level2Depth5:{inst}",
-                        "response": True
-                    }))
-
-                async for msg in ws:
-                    # Получаем пуши
-                    inform = json.loads(msg)
-                    # проверяем, что это стакан
-                    if "data" not in inform or not inform["data"]:
-                        continue
-                    instId = inform["topic"].split(":", 1)[1]
-                    print(instId)
-                    data = inform["data"]
-                    ask = float(data["asks"][0][0])
-                    bid = float(data["bids"][0][0])
-                    volume_ask = float(data["asks"][0][1])
-                    volume_bid = float(data["bids"][0][1])
-                    # prices["kucoin"].update({
-                    #     "ask": ask,
-                    #     "bid": bid,
-                    #     "ask_qty": volume_ask,
-                    #     "bid_qty": volume_bid,
-                    #     "ts": int(data["timestamp"])
-                    # })
-                    # print(prices["kucoin"])
+        sleep(1)
 
 
-        except CancelledError as e:
-            print('Interrupted by user')
-
-        except Exception as e:
-            print("reconnect:", e)
-            await asyncio.sleep(2)
-
-asyncio.run(kucoin_ws())
+asyncio.run(byu_bit())

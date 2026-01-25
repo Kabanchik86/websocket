@@ -1,6 +1,7 @@
 import asyncio, time
 from okx import okx
 from ku_koin import kucoin_ws
+from buy_bit import buy_bit
 from exel import write_to_arbitrage
 
 prices = {
@@ -11,6 +12,10 @@ prices = {
             'NEAR-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
             'ATOM-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
             'AVAX-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+            'DOT-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+            'UNI-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+            'PEPE-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+
             },
     "kucoin": {'TON-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
                'SUI-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
@@ -18,13 +23,28 @@ prices = {
                'NEAR-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
                'ATOM-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
                'AVAX-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-               }
+               'DOT-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+               'UNI-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+               'PEPE-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+               },
+
+    "buy_bit": {'TON-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+                'SUI-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+                'APT-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+                'NEAR-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+                'ATOM-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+                'AVAX-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+                'DOT-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+                'UNI-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+                'PEPE-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+                }
 }
 
 async def main():
     await asyncio.gather(
         okx(prices),
         kucoin_ws(prices),
+        buy_bit(prices),
         compare_loop()
     )
 
@@ -36,20 +56,27 @@ async def compare_loop():
 
     while True:
         #print(prices)
-        common_pairs = set(prices["okx"].keys()) & set(prices["kucoin"].keys())
+        common_pairs = (
+                set(prices["okx"].keys())
+                & set(prices["kucoin"].keys())
+                & set(prices["buy_bit"].keys())
+        )
 
         for pair in common_pairs:
             okx = prices["okx"][pair]
             kuc = prices["kucoin"][pair]
-            #print(kuc)
-            # есть ли обе котировки
-            if okx["ask"] and okx["bid"] and kuc["ask"] and kuc["bid"]:
+            buy_bit = prices["buy_bit"][pair]
+            #print(buy_bit)
+            # есть ли все котировки
+            if (okx["ask"] and okx["bid"]
+                    and kuc["ask"] and kuc["bid"]
+                    and buy_bit["ask"] and buy_bit["bid"]):
 
                 now_ms = int(time.time() * 1000)
                 current_time = time.strftime("%H:%M:%S")
 
                 # свежие ли данные
-                if (now_ms - okx["ts"] <= TTL_MS) and (now_ms - kuc["ts"] <= TTL_MS):
+                if (now_ms - okx["ts"] <= TTL_MS) and (now_ms - kuc["ts"] <= TTL_MS) and (now_ms - buy_bit["ts"] <= TTL_MS):
 
                     # Направление 1: BUY OKX (ask) -> SELL KuCoin (bid)
                     buy = okx["ask"]  # лучшая цена продажи
@@ -71,7 +98,29 @@ async def compare_loop():
                         spread = (sell - buy) / buy
                         if spread >= MIN_SPREAD:
                             # print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
-                            write_to_arbitrage(buy, sell, spread, need_base, current_time)
+                            write_to_arbitrage(buy, sell, spread, need_base, current_time, pair)
+
+                    # Направление 3: BUY Buy_bit (ask) -> SELL KuCoin (bid)
+                    buy = buy_bit["ask"]  # лучшая цена продажи
+                    sell = kuc["bid"]  # лучшая цена покупки
+                    need_base = USDT_AMOUNT / buy
+
+                    if buy_bit["ask_qty"] >= need_base and kuc["bid_qty"] >= need_base:
+                        spread = (sell - buy) / buy  # пред, разница между биржами
+                        if spread >= MIN_SPREAD:
+                            # print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
+                            write_to_arbitrage(buy, sell, spread, need_base, current_time, pair)
+
+                    # Направление 4: BUY KuCoin (ask) -> SELL Buy_bit (bid)
+                    buy = kuc["ask"]
+                    sell = buy_bit["bid"]
+                    need_base = USDT_AMOUNT / buy
+
+                    if kuc["ask_qty"] >= need_base and buy_bit["bid_qty"] >= need_base:
+                        spread = (sell - buy) / buy
+                        if spread <= MIN_SPREAD:
+                            # print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
+                            write_to_arbitrage(buy, sell, spread, need_base, current_time, pair)
 
             await asyncio.sleep(0.2)  # 200 мс
 

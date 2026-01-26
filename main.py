@@ -52,7 +52,7 @@ async def main():
 
 async def compare_loop():
     USDT_AMOUNT = 10  # 10$
-    MIN_SPREAD = 0.001  # 0.1% для старта
+    MIN_SPREAD = 0.002  # 0.2% для старта
     TTL_MS = 10000  # котировка считается свежей 10 сек
 
     while True:

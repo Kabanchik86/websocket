@@ -40,7 +40,7 @@ def write_to_sheet(coin_name, sol, amount, input_mint):
     )
 
 
-def write_to_arbitrage(buy, sell, spread, need_base, current_time, pair):
+def write_to_arbitrage(buy, sell, spread, need_base, current_time, pair, direction):
     """
     Записывает данные в первую пустую строку
     A - coin_name
@@ -56,6 +56,6 @@ def write_to_arbitrage(buy, sell, spread, need_base, current_time, pair):
     row = len(col_a) + 1
 
     sheet5.update(
-        f"A{row}:F{row}",
-        [[buy, sell, spread, need_base, current_time, pair]]
+        f"A{row}:J{row}",
+        [[buy, sell, spread, need_base, current_time, pair, direction]]
     )

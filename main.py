@@ -4,6 +4,7 @@ from ku_koin import kucoin_ws
 from buy_bit import buy_bit
 from exel import write_to_arbitrage
 
+# Спот
 prices = {
     "okx": {'TON-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
             'SUI-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
@@ -51,7 +52,7 @@ async def main():
 
 async def compare_loop():
     USDT_AMOUNT = 10  # 10$
-    MIN_SPREAD = 0.005  # 0.5% для старта
+    MIN_SPREAD = 0.001  # 0.1% для старта
     TTL_MS = 10000  # котировка считается свежей 10 сек
 
     while True:
@@ -68,9 +69,9 @@ async def compare_loop():
             buy_bit = prices["buy_bit"][pair]
             #print(buy_bit)
             # есть ли все котировки
-            if (okx["ask"] and okx["bid"]
-                    and kuc["ask"] and kuc["bid"]
-                    and buy_bit["ask"] and buy_bit["bid"]):
+            if (okx["ask"] is not None and okx["bid"] is not None
+                    and kuc["ask"] is not None and kuc["bid"] is not None
+                    and buy_bit["ask"] is not None  and buy_bit["bid"] is not None ):
 
                 now_ms = int(time.time() * 1000)
                 current_time = time.strftime("%H:%M:%S")
@@ -87,7 +88,7 @@ async def compare_loop():
                         spread = (sell - buy) / buy  # пред, разница между биржами
                         if spread >= MIN_SPREAD:
                             # print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
-                            write_to_arbitrage(buy, sell, spread, need_base, current_time, pair)
+                            write_to_arbitrage(buy, sell, spread, need_base, current_time, pair, 'Направление 1: BUY OKX (ask) -> SELL KuCoin (bid)')
 
                     # Направление 2: BUY KuCoin (ask) -> SELL OKX (bid)
                     buy = kuc["ask"]
@@ -98,7 +99,7 @@ async def compare_loop():
                         spread = (sell - buy) / buy
                         if spread >= MIN_SPREAD:
                             # print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
-                            write_to_arbitrage(buy, sell, spread, need_base, current_time, pair)
+                            write_to_arbitrage(buy, sell, spread, need_base, current_time, pair, 'Направление 2: BUY KuCoin (ask) -> SELL OKX (bid)')
 
                     # Направление 3: BUY Buy_bit (ask) -> SELL KuCoin (bid)
                     buy = buy_bit["ask"]  # лучшая цена продажи
@@ -109,7 +110,7 @@ async def compare_loop():
                         spread = (sell - buy) / buy  # пред, разница между биржами
                         if spread >= MIN_SPREAD:
                             # print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
-                            write_to_arbitrage(buy, sell, spread, need_base, current_time, pair)
+                            write_to_arbitrage(buy, sell, spread, need_base, current_time, pair, 'Направление 3: BUY Buy_bit (ask) -> SELL KuCoin (bid)')
 
                     # Направление 4: BUY KuCoin (ask) -> SELL Buy_bit (bid)
                     buy = kuc["ask"]
@@ -120,9 +121,9 @@ async def compare_loop():
                         spread = (sell - buy) / buy
                         if spread >= MIN_SPREAD:
                             # print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
-                            write_to_arbitrage(buy, sell, spread, need_base, current_time, pair)
+                            write_to_arbitrage(buy, sell, spread, need_base, current_time, pair, 'Направление 4: BUY KuCoin (ask) -> SELL Buy_bit (bid)')
 
-            await asyncio.sleep(0.2)  # 200 мс
+        await asyncio.sleep(0.2)  # 200 мс
 
 
 if __name__ == '__main__':

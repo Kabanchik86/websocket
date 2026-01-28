@@ -30,8 +30,6 @@ async def buy_bit(prices):
                 "bid_qty": volume_bid,
                 "ts": ts
             }
-        #print(ask, bid, volume_ask, volume_bid, instId, ts)
-
 
     for inst in INSTS:
         ws.orderbook_stream(

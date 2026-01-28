@@ -38,7 +38,6 @@ async def okx(prices):
                         "bid_qty": volume_bid,
                         "ts": int(data["ts"])  # OKX ts уже в мс строкой
                     }
-                    # print(prices["okx"])
 
         except CancelledError as e:
             print('Interrupted by user')

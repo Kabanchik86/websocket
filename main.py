@@ -67,9 +67,9 @@ async def compare_loop():
             okx = prices["okx"][pair]
             kuc = prices["kucoin"][pair]
             buy_bit = prices["buy_bit"][pair]
-            print(f'Buy_bit {okx}')
-            print(f'Buy_bit {kuc}')
-            print(f'Buy_bit {buy_bit}')
+            print(f'okx {okx}')
+            print(f'kuc {kuc}')
+            print(f'buy_bit {buy_bit}')
             # есть ли все котировки
             if (okx["ask"] is not None and okx["bid"] is not None
                     and kuc["ask"] is not None and kuc["bid"] is not None

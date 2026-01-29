@@ -1,7 +1,6 @@
 import asyncio, json, websockets, sys
 sys.path.append("mexc_pb")
 import PushDataV3ApiWrapper_pb2
-#from google.protobuf.json_format import MessageToDict
 from asyncio.exceptions import CancelledError
 
 URL="wss://wbs-api.mexc.com/ws"

@@ -4,3 +4,4 @@ aiohttp
 gspread
 google-auth
 pybit
+protobuf

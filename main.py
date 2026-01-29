@@ -89,7 +89,7 @@ async def compare_loop():
     USDT_AMOUNT = 10  # 10$
     MIN_SPREAD = 0.004  # 0.4% для старта
     TTL_MS = 10000  # котировка считается свежей 10 сек
-
+    last_dbg = 0
     while True:
         #print(prices)
         common_pairs = (
@@ -105,10 +105,12 @@ async def compare_loop():
             kuc = prices["kucoin"][pair]
             buy_bit = prices["buy_bit"][pair]
             mecx = prices["mecx"][pair]
-            print(f'okx {okx}')
-            print(f'kuc {kuc}')
-            print(f'buy_bit {buy_bit}')
-            print(f'mecx {mecx}')
+            if time.time() - last_dbg > 4:
+                print(f'okx {okx}')
+                print(f'kuc {kuc}')
+                print(f'buy_bit {buy_bit}')
+                print(f'mecx {mecx}')
+                last_dbg = time.time()
             # есть ли все котировки
             if (okx["ask"] is not None and okx["bid"] is not None
                     and kuc["ask"] is not None and kuc["bid"] is not None

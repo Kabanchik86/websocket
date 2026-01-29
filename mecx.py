@@ -4,9 +4,17 @@ import PushDataV3ApiWrapper_pb2
 from asyncio.exceptions import CancelledError
 
 URL="wss://wbs-api.mexc.com/ws"
-CH=["spot@public.limit.depth.v3.api.pb@TONUSDT@5", "spot@public.limit.depth.v3.api.pb@SUIUSDT@5", "spot@public.limit.depth.v3.api.pb@APTUSDT@5",
-    "spot@public.limit.depth.v3.api.pb@NEARUSDT@5","spot@public.limit.depth.v3.api.pb@ATOMUSDT@5","spot@public.limit.depth.v3.api.pb@AVAXUSDT@5",
-    "spot@public.limit.depth.v3.api.pb@DOTUSDT@5", "spot@public.limit.depth.v3.api.pb@UNIUSDT@5", "spot@public.limit.depth.v3.api.pb@PEPEUSDT@5"]
+CH = ["spot@public.limit.depth.v3.api.pb@TONUSDT@5", "spot@public.limit.depth.v3.api.pb@SUIUSDT@5",
+      "spot@public.limit.depth.v3.api.pb@APTUSDT@5",
+      "spot@public.limit.depth.v3.api.pb@NEARUSDT@5", "spot@public.limit.depth.v3.api.pb@ATOMUSDT@5",
+      "spot@public.limit.depth.v3.api.pb@AVAXUSDT@5",
+      "spot@public.limit.depth.v3.api.pb@DOTUSDT@5", "spot@public.limit.depth.v3.api.pb@UNIUSDT@5",
+      "spot@public.limit.depth.v3.api.pb@PEPEUSDT@5",
+      "spot@public.limit.depth.v3.api.pb@RENDERUSDT@5", "spot@public.limit.depth.v3.api.pb@TRUMPUSDT@5",
+      "spot@public.limit.depth.v3.api.pb@FILUSDT@5",
+      "spot@public.limit.depth.v3.api.pb@FLRUSDT@5", "spot@public.limit.depth.v3.api.pb@JUPUSDT@5",
+      "spot@public.limit.depth.v3.api.pb@PENGUUSDT@5",
+      ]
 
 
 quote = "USDT"

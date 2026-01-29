@@ -1,7 +1,8 @@
 import asyncio, json, time, requests, websockets
 from asyncio.exceptions import CancelledError
 
-INSTS = ["TON-USDT", "SUI-USDT", "SOL-USDT", "APT-USDT", "NEAR-USDT", "ATOM-USDT", "AVAX-USDT", "DOT-USDT", "UNI-USDT", "PEPE-USDT"]
+INSTS = ["TON-USDT", "SUI-USDT", "APT-USDT", "NEAR-USDT", "ATOM-USDT", "AVAX-USDT", "DOT-USDT", "UNI-USDT", "PEPE-USDT",
+             "RENDER-USDT", "TRUMP-USDT", "FIL-USDT", "FLR-USDT", "JUP-USDT", "PENGU-USDT"]
 
 def get_bullet():
     r = requests.post("https://api.kucoin.com/api/v1/bullet-public").json()

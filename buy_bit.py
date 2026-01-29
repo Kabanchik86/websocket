@@ -2,7 +2,9 @@ from pybit.unified_trading import WebSocket
 import asyncio
 from time import sleep
 
-INSTS = ["TONUSDT", "SUIUSDT", "APTUSDT", "NEARUSDT", "ATOMUSDT", "AVAXUSDT", "DOTUSDT", "UNIUSDT", "PEPEUSDT"]
+INSTS = ["TONUSDT", "SUIUSDT", "APTUSDT", "NEARUSDT", "ATOMUSDT", "AVAXUSDT", "DOTUSDT", "UNIUSDT", "PEPEUSDT",
+         "RENDERUSDT", "TRUMPUSDT", "FILUSDT", "FLRUSDT", "JUPUSDT", "PENGUUSDT"
+         ]
 quote = "USDT"
 
 async def buy_bit(prices):

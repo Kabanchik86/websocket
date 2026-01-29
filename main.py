@@ -122,7 +122,7 @@ async def compare_loop():
 
                 # свежие ли данные
 
-                if (now_ms - okx["ts"] <= TTL_MS) and (now_ms - kuc["ts"] <= TTL_MS) and (now_ms - buy_bit["ts"] <= TTL_MS and now_ms - mecx["ts"] <= TTL_MS):
+                if (now_ms - okx["ts"] <= TTL_MS) and (now_ms - kuc["ts"] <= TTL_MS) and (now_ms - buy_bit["ts"] <= TTL_MS) and (now_ms - mecx["ts"] <= TTL_MS):
 
                     # Направление 1: BUY OKX (ask) -> SELL KuCoin (bid)
                     buy = okx["ask"]  # лучшая цена продажи

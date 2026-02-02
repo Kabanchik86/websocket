@@ -2,7 +2,7 @@ import asyncio, time
 from okx import okx
 from ku_koin import kucoin_ws
 from buy_bit import buy_bit
-from mecx import mecx
+from mexc_perp import mecx
 from exel import write_to_arbitrage
 
 # Спот
@@ -61,13 +61,13 @@ prices = {
              'APT-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
              'NEAR-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
              'ATOM-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-             'AVAX-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-             'DOT-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+             'AVAX-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},###
+             'DOT-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},###
              'UNI-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
              'PEPE-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
              'RENDER-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
              'TRUMP-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-             'FIL-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+             #'FIL-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
              'FLR-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
              'JUP-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
              'PENGU-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None}
@@ -87,11 +87,10 @@ async def main():
 
 async def compare_loop():
     USDT_AMOUNT = 10  # 10$
-    MIN_SPREAD = 0.004  # 0.4% для старта
+    MIN_SPREAD = 0.006  # 0.6% для старта
     TTL_MS = 10000  # котировка считается свежей 10 сек
     last_dbg = 0
     while True:
-        #print(prices)
         common_pairs = (
                 set(prices["okx"].keys())
                 & set(prices["kucoin"].keys())
@@ -105,7 +104,7 @@ async def compare_loop():
             kuc = prices["kucoin"][pair]
             buy_bit = prices["buy_bit"][pair]
             mecx = prices["mecx"][pair]
-            if time.time() - last_dbg > 4:
+            if time.time() - last_dbg > 2:
                 print(f'okx {okx}')
                 print(f'kuc {kuc}')
                 print(f'buy_bit {buy_bit}')

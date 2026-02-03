@@ -25,7 +25,7 @@ async def okx_perp(prices):
                     if "data" not in inform or not inform["data"]:
                         continue
 
-                    instId = inform["arg"]['instId']
+                    instId = inform["arg"]['instId'].replace("-SWAP", "")
                     data = inform["data"][0]
                     ask = float(data["asks"][0][0])
                     bid = float(data["bids"][0][0])
@@ -33,12 +33,12 @@ async def okx_perp(prices):
                     volume_bid = float(data["bids"][0][1])
 
                     #print(instId, ask, bid, volume_ask, volume_bid)
-                    prices["okx"][instId] ={
+                    prices["okx_perp"][instId] ={
                         "ask": ask,
                         "bid": bid,
                         "ask_qty": volume_ask,
                         "bid_qty": volume_bid,
-                        "ts": int(data["ts"])  # OKX ts уже в мс строкой
+                        "ts": int(data["ts"])
                     }
 
         except CancelledError as e:

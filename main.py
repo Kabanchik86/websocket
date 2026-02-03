@@ -220,16 +220,16 @@ async def compare_loop():
                             # print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
                             write_to_arbitrage(buy, sell, spread, need_base, current_time, pair, 'Направление 3: BUY Buy_bit (ask) -> SELL KuCoin_perp (bid)')
 
-                    # Направление 4: BUY KuCoin (ask) -> SELL Buy_bit (bid)
-                    buy = kuc["ask"]
-                    sell = buy_bit["bid"]
-                    need_base = USDT_AMOUNT / buy
-
-                    if kuc["ask_qty"] >= need_base and buy_bit["bid_qty"] >= need_base:
-                        spread = (sell - buy) / buy
-                        if spread >= MIN_SPREAD:
-                            #print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
-                            write_to_arbitrage(buy, sell, spread, need_base, current_time, pair, 'Направление 4: BUY KuCoin (ask) -> SELL Buy_bit (bid)')
+                    # # Направление 4: BUY KuCoin (ask) -> SELL Buy_bit (bid)
+                    # buy = kuc["ask"]
+                    # sell = buy_bit["bid"]
+                    # need_base = USDT_AMOUNT / buy
+                    #
+                    # if kuc["ask_qty"] >= need_base and buy_bit["bid_qty"] >= need_base:
+                    #     spread = (sell - buy) / buy
+                    #     if spread >= MIN_SPREAD:
+                    #         #print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
+                    #         write_to_arbitrage(buy, sell, spread, need_base, current_time, pair, 'Направление 4: BUY KuCoin (ask) -> SELL Buy_bit (bid)')
 
                     # Направление 5: BUY OKX (ask) -> SELL mecx_perp (bid)
                     buy = okx["ask"]  # лучшая цена продажи
@@ -264,16 +264,52 @@ async def compare_loop():
                             # print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
                             write_to_arbitrage(buy, sell, spread, need_base, current_time, pair,'Направление 7: BUY Buy_bit (ask) -> SELL mecx_perp (bid)')
 
-                    # Направление 8: BUY mecx (ask) -> SELL Buy_bit (bid)
-                    buy = mecx["ask"]
-                    sell = buy_bit["bid"]
+                    # # Направление 8: BUY mecx (ask) -> SELL Buy_bit (bid)
+                    # buy = mecx["ask"]
+                    # sell = buy_bit["bid"]
+                    # need_base = USDT_AMOUNT / buy
+                    #
+                    # if mecx["ask_qty"] >= need_base and buy_bit["bid_qty"] >= need_base:
+                    #     spread = (sell - buy) / buy
+                    #     if spread >= MIN_SPREAD:
+                    #         # print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
+                    #         write_to_arbitrage(buy, sell, spread, need_base, current_time, pair,'Направление 8: BUY mecx (ask) -> SELL Buy_bit (bid)')
+
+                    # Направление 9: BUY OKX (ask) -> SELL OKX_pepr (bid)
+                    buy = okx["ask"]
+                    sell = okx_perp["bid"]
                     need_base = USDT_AMOUNT / buy
 
-                    if mecx["ask_qty"] >= need_base and buy_bit["bid_qty"] >= need_base:
+                    if okx["ask_qty"] >= need_base and okx_perp["bid_qty"] >= need_base:
                         spread = (sell - buy) / buy
                         if spread >= MIN_SPREAD:
                             # print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
-                            write_to_arbitrage(buy, sell, spread, need_base, current_time, pair,'Направление 8: BUY mecx (ask) -> SELL Buy_bit (bid)')
+                            write_to_arbitrage(buy, sell, spread, need_base, current_time, pair,
+                                               'Направление 9: BUY OKX (ask) -> SELL OKX_perp (bid)')
+
+                    # Направление 10: BUY Kukcoin (ask) -> SELL Kukoin_perp (bid)
+                    buy = kuc["ask"]
+                    sell = kuc_perp["bid"]
+                    need_base = USDT_AMOUNT / buy
+
+                    if kuc["ask_qty"] >= need_base and kuc_perp["bid_qty"] >= need_base:
+                        spread = (sell - buy) / buy
+                        if spread >= MIN_SPREAD:
+                        # print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
+                            write_to_arbitrage(buy, sell, spread, need_base, current_time, pair,
+                                           'Направление 10: BUY Kucoin (ask) -> SELL Kucoin_perp (bid)')
+
+                    # Направление 11: BUY Mexc (ask) -> SELL Mexc_perp (bid)
+                    buy = mecx["ask"]
+                    sell = mecx_perp["bid"]
+                    need_base = USDT_AMOUNT / buy
+
+                    if mecx["ask_qty"] >= need_base and mecx_perp["bid_qty"] >= need_base:
+                        spread = (sell - buy) / buy
+                        if spread >= MIN_SPREAD:
+                            # print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
+                            write_to_arbitrage(buy, sell, spread, need_base, current_time, pair,
+                                               'Направление 11: BUY Mexc (ask) -> SELL Mexc_perp (bid)')
 
         await asyncio.sleep(0.2)  # 200 мс
 

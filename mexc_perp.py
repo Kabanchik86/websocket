@@ -35,11 +35,11 @@ def apply(updates, book):
             book[price] = qty
 
 # websocket connect
-async def mecx(prices):
+async def mecx_perp(prices):
     while True:
         try:
             async with websockets.connect(URL, ping_interval=None, ping_timeout=None) as ws:
-                print("Connected_mecx")
+                print("Connected_mecx_perp")
                 # 🔥 ВАЖНО: очистить старые данные после реконнекта
                 bids.clear()
                 asks.clear()
@@ -103,7 +103,7 @@ async def mecx(prices):
                             best_ask_p = min(asks[instId])
                             best_bid_q = bids[instId][best_bid_p]
                             best_ask_q = asks[instId][best_ask_p]
-                            prices["mecx"][instId] = {
+                            prices["mecx_perp"][instId] = {
                                 "ask": best_ask_p,
                                 "bid": best_bid_p,
                                 "ask_qty": best_ask_q,

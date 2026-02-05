@@ -8,6 +8,7 @@ INSTS = ["TONUSDT", "SUIUSDT", "APTUSDT", "NEARUSDT", "ATOMUSDT", "AVAXUSDT", "D
 quote = "USDT"
 
 async def buy_bit(prices):
+    await asyncio.sleep(0.1)
     ws = WebSocket(
         testnet=False,
         channel_type="spot",

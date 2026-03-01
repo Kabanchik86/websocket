@@ -7,8 +7,10 @@ last_update = {}
 last_ts = {}
 
 
+#INSTS = ["FLR_USDT"]
+
 INSTS = ["FLR_USDT","SUI_USDT","APT_USDT","NEAR_USDT","ATOM_USDT","AVAX_USDT","DOT_USDT","UNI_USDT","PEPE_USDT"
-           ,"JUP_USDT","PENGU_USDT","RENDER_USDT","TRUMP_USDT", "TON_USDT", "FIL_USDT"]
+            ,"JUP_USDT","PENGU_USDT","RENDER_USDT","TRUMP_USDT", "TON_USDT", "FIL-USDT"]
 
 def apply(updates, book):
     for price, qty in updates:
@@ -19,35 +21,18 @@ def apply(updates, book):
         else:
             book[price] = qty
 
-async def gate_ping(ws):
-    try:
-        while True:
-            await asyncio.sleep(15)   # можно 15–20 сек
-            await ws.send(json.dumps({
-                "time": int(time.time()),
-                "channel": "futures.ping",
-                "event": "ping"
-            }))
-    except asyncio.CancelledError:
-        # корректное завершение ping при реконнекте
-        pass
-
-async def gate_perp(prices):
-    url = "wss://fx-ws.gateio.ws/v4/ws/usdt"
+async def gate(prices):
+    url = "wss://api.gateio.ws/ws/v4/"
 
     while True:
         try:
-            ping_task = None
             async with websockets.connect(url, ping_interval=20, ping_timeout=20) as ws:
-                print("Connected_gate_perp")
-
-                # 🔹 запускаем futures.ping task
-                ping_task = asyncio.create_task(gate_ping(ws))
+                print("Connected_gate")
 
                 for inst in INSTS:
                     await ws.send(json.dumps({
                         "time": int(time.time()),
-                        "channel": "futures.obu",
+                        "channel": "spot.obu",
                         "event": "subscribe",
                         "payload": [f"ob.{inst}.50"]
                     }))
@@ -58,9 +43,7 @@ async def gate_perp(prices):
                     except json.JSONDecodeError:
                         continue
 
-                    # игнорируем pong
-                    if inform.get("event") == "pong":
-                        continue
+                    #print(inform)
 
                     ev = inform.get("event")  # <-- вместо inform["event"]
                     if ev == "subscribe":
@@ -135,7 +118,7 @@ async def gate_perp(prices):
                         best_bid_q = bids[instId][best_bid_p]
                         best_ask_q = asks[instId][best_ask_p]
                         tm = last_ts[instId]
-                        prices["gate_perp"][instId] = {
+                        prices["gate"][instId] = {
                             "ask": best_ask_p,
                             "bid": best_bid_p,
                             "ask_qty": best_ask_q,
@@ -151,11 +134,4 @@ async def gate_perp(prices):
             print(f"Reconnect after error: {type(e).__name__}: {e}")
             await asyncio.sleep(2)
 
-        finally:
-            # 🔹 при любом выходе из async with отменяем ping
-            try:
-                ping_task.cancel()
-            except:
-                pass
-
-# asyncio.run(gate_perp())
+# asyncio.run(gate())

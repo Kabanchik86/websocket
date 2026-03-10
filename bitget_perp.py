@@ -4,14 +4,13 @@ from asyncio.exceptions import CancelledError
 
 # WEBSOKET BITGATE#############################################
 
-async def bitgate_perp(prices):
+async def bitget_perp(prices):
     url = "	wss://ws.bitget.com/v2/ws/public"
-    INSTS = ["TONUSDT", "SUIUSDT", "APTUSDT", "NEARUSDT", "ATOMUSDT", "AVAXUSDT", "DOTUSDT", "UNIUSDT", "PEPEUSDT",
-              "RENDERUSDT", "TRUMPUSDT", "FILUSDT", "JUPUSDT", "PENGUUSDT"]
+    INSTS = ["WIFUSDT", "AXSUSDT", "SOONUSDT", "AVNTUSDT", "0GUSDT"]
     while True:
         try:
             async with websockets.connect(url, ping_interval=20, ping_timeout=20) as ws:
-                print("Connected_bitgate_perp")
+                print("Connected_bitget_perp")
                 # Сообщение для подписки
                 subscribe_msg = {
                     "op": "subscribe",
@@ -34,7 +33,7 @@ async def bitgate_perp(prices):
                     volume_bid = float(data["bids"][0][1])
 
                     #print(instId, ask, bid, volume_ask, volume_bid)
-                    prices["bitgate_perp"][instId] ={
+                    prices["bitget_perp"][instId] ={
                         "ask": ask,
                         "bid": bid,
                         "ask_qty": volume_ask,

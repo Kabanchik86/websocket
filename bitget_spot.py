@@ -4,7 +4,7 @@ from asyncio.exceptions import CancelledError
 
 # WEBSOKET BITGATE#############################################
 
-async def bitget():
+async def bitget(prices):
     url = "	wss://ws.bitget.com/v2/ws/public"
     INSTS = ["WIFUSDT", "AXSUSDT", "SOONUSDT", "AVNTUSDT", "0GUSDT"]
     while True:
@@ -32,14 +32,14 @@ async def bitget():
                     volume_ask = float(data["asks"][0][1])
                     volume_bid = float(data["bids"][0][1])
 
-                    print(instId, ask, bid, volume_ask, volume_bid)
-                    # prices["bitget"][instId] ={
-                    #     "ask": ask,
-                    #     "bid": bid,
-                    #     "ask_qty": volume_ask,
-                    #     "bid_qty": volume_bid,
-                    #     "ts": int(data["ts"])
-                    # }
+                    #print(instId, ask, bid, volume_ask, volume_bid)
+                    prices["bitget"][instId] ={
+                        "ask": ask,
+                        "bid": bid,
+                        "ask_qty": volume_ask,
+                        "bid_qty": volume_bid,
+                        "ts": int(data["ts"])
+                    }
 
         except CancelledError as e:
             print('Interrupted by user')
@@ -47,4 +47,4 @@ async def bitget():
             print(f"Reconnect after error: {type(e).__name__}: {e}")
             await asyncio.sleep(2)
 
-asyncio.run(bitget())
+#asyncio.run(bitgate())

@@ -6,8 +6,7 @@ from asyncio.exceptions import CancelledError
 
 async def okx_perp(prices):
     url = "wss://ws.okx.com:8443/ws/v5/public"
-    INSTS = ["TON-USDT-SWAP", "SUI-USDT-SWAP", "APT-USDT-SWAP", "NEAR-USDT-SWAP", "ATOM-USDT-SWAP", "AVAX-USDT-SWAP", "DOT-USDT-SWAP", "UNI-USDT-SWAP", "PEPE-USDT-SWAP",
-             "RENDER-USDT-SWAP", "TRUMP-USDT-SWAP", "FIL-USDT-SWAP", "JUP-USDT-SWAP", "PENGU-USDT-SWAP"]
+    INSTS = ["WIF-USDT-SWAP", "AXS-USDT-SWAP", "SOON-USDT-SWAP", "AVNT-USDT-SWAP", "0G-USDT-SWAP"]
     while True:
         try:
             async with websockets.connect(url, ping_interval=20, ping_timeout=20) as ws:

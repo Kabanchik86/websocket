@@ -397,7 +397,7 @@ async def compare_loop():
                         spread = (sell - buy) / buy  # пред, разница между биржами
                         if spread >= MIN_SPREAD:
                             # print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
-                            write_to_arbitrage(buy, sell, spread, need_base, current_time, pair, 'Направление 13 PERP: BUY OKX (ask) -> SELL BITGET_perp (bid)')
+                            write_to_arbitrage(buy, sell, spread, need_base, current_time, pair, 'Направление 1 PERP: BUY OKX (ask) -> SELL BITGET_perp (bid)')
                     #
                     # # Направление 14: BUY Kucoin (ask) -> SELL Bitgate_perp (bid)
                     # buy = kuc["ask"]  # лучшая цена продажи
@@ -423,7 +423,20 @@ async def compare_loop():
                         spread = (sell - buy) / buy  # пред, разница между биржами
                         if spread >= MIN_SPREAD:
                             # print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
-                            write_to_arbitrage(buy, sell, spread, need_base, current_time, pair, 'Направление 13 PERP: BUY BITGET (ask) -> SELL OKX_perp (bid)')
+                            write_to_arbitrage(buy, sell, spread, need_base, current_time, pair, 'Направление 2 PERP: BUY BITGET (ask) -> SELL OKX_perp (bid)')
+
+
+                    if bitget["ask_qty"] >= need_base and bitget_perp["bid_qty"] >= need_base:
+                        spread = (sell - buy) / buy  # пред, разница между биржами
+                        if spread >= MIN_SPREAD:
+                            # print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
+                            write_to_arbitrage(buy, sell, spread, need_base, current_time, pair, 'Направление 3 PERP: BUY BITGET (ask) -> SELL BITGET_perp (bid)')
+
+                    if okx["ask_qty"] >= need_base and okx_perp["bid_qty"] >= need_base:
+                        spread = (sell - buy) / buy  # пред, разница между биржами
+                        if spread >= MIN_SPREAD:
+                            # print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
+                            write_to_arbitrage(buy, sell, spread, need_base, current_time, pair, 'Направление 4 PERP: BUY OKX (ask) -> SELL OKX_perp (bid)')
 
 ########################################################################################################################
                     # # Направление 1: BUY OKX (ask) -> SELL KuCoin (bid)

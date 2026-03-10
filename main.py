@@ -395,7 +395,7 @@ async def compare_loop():
 
                     if okx["ask_qty"] >= need_base and bitget_perp["bid_qty"] >= need_base:
                         spread = (sell - buy) / buy  # пред, разница между биржами
-                        if spread <= MIN_SPREAD:
+                        if spread >= MIN_SPREAD:
                             # print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
                             write_to_arbitrage(buy, sell, spread, need_base, current_time, pair, 'Направление 13 PERP: BUY OKX (ask) -> SELL BITGET_perp (bid)')
                     #

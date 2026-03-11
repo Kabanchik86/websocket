@@ -6,11 +6,11 @@ from bitget_perp import bitget_perp
 from bitget_spot import bitget
 
 prices = {
-    "okx": {'WIF-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'AXS-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'SOON-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'AVNT-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'OG-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+    "okx": {'LAB-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+            'KGEN-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+            'RLS-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+            'APR-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+            'COAI-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
             # 'AVAX-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
             # 'DOT-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
             # 'UNI-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
@@ -22,11 +22,11 @@ prices = {
             # 'JUP-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
             # 'PENGU-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None}
             },
-    "okx_perp": {'WIF-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'AXS-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'SOON-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'AVNT-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'OG-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+    "okx_perp": {'LAB-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+            'KGEN-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+            'RLS-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+            'APR-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+            'COAI-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
             # 'AVAX-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
             # 'DOT-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
             # 'UNI-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
@@ -134,11 +134,11 @@ prices = {
             'JUP-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
             'PENGU-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None}
          },
-    "bitget_perp": {'WIF-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'AXS-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'SOON-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'AVNT-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'OG-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+    "bitget_perp": {'LAB-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+            'KGEN-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+            'RLS-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+            'APR-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+            'COAI-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
             # 'AVAX-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},  ###
             # 'DOT-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},  ###
             # 'UNI-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
@@ -150,12 +150,11 @@ prices = {
             # 'JUP-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
             # 'PENGU-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None}
          },
-    "bitget": {'WIF-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'AXS-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'APT-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'SOON-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'AVNT-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'OG-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},  ###
+    "bitget": {'LAB-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+            'KGEN-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+            'RLS-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+            'APR-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
+            'COAI-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None}, ###
             # 'DOT-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},  ###
             # 'UNI-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
             # 'PEPE-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},

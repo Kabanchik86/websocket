@@ -6,7 +6,7 @@ from asyncio.exceptions import CancelledError
 
 async def bitget():
     url = "	wss://ws.bitget.com/v2/ws/public"
-    INSTS = ["WIFUSDT", "AXSUSDT", "SOONUSDT", "AVNTUSDT", "0GUSDT"]
+    INSTS = ["LABUSDT", "KGENUSDT", "RLSUSDT", "APRUSDT", "COAIUSDT"]
     while True:
         try:
             async with websockets.connect(url, ping_interval=20, ping_timeout=20) as ws:

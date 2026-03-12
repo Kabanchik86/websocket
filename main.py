@@ -1,43 +1,17 @@
 import asyncio, time
-from okx_1 import okx
 from exel import write_to_arbitrage
 from okx_perp import okx_perp
 from bitget_perp import bitget_perp
 from bitget_spot import bitget
+from exel import sheet2
+
+INSTS = sheet2.col_values(1)[1:]
 
 prices = {
-    "okx": {'LAB-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'KGEN-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'RLS-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'APR-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'COAI-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'AVAX-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'DOT-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'UNI-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'PEPE-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'RENDER-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'TRUMP-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'FIL-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'FLR-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'JUP-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'PENGU-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None}
-            },
-    "okx_perp": {'LAB-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'KGEN-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'RLS-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'APR-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'COAI-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'AVAX-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'DOT-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'UNI-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'PEPE-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'RENDER-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'TRUMP-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'FIL-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # #'FLR-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'JUP-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'PENGU-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None}
-            },
+    # "okx": {inst: {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None}
+    #     for inst in INSTS},
+    "okx_perp": {inst: {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None}
+        for inst in INSTS},
     "kucoin": {'TON-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
                'SUI-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
                'APT-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
@@ -134,42 +108,15 @@ prices = {
             'JUP-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
             'PENGU-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None}
          },
-    "bitget_perp": {'LAB-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'KGEN-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'RLS-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'APR-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'COAI-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'AVAX-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},  ###
-            # 'DOT-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},  ###
-            # 'UNI-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'PEPE-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'RENDER-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'TRUMP-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'FIL-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'FLR-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'JUP-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'PENGU-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None}
-         },
-    "bitget": {'LAB-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'KGEN-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'RLS-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'APR-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            'COAI-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None}, ###
-            # 'DOT-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},  ###
-            # 'UNI-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'PEPE-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'RENDER-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'TRUMP-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'FIL-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'FLR-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'JUP-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
-            # 'PENGU-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None}
-         },
+    "bitget_perp": {inst: {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None}
+        for inst in INSTS},
+    "bitget": {inst: {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None}
+        for inst in INSTS},
 }
 
 async def main():
     await asyncio.gather(
-        okx(prices),
+        #okx(prices),
         okx_perp(prices),
         # kucoin_ws(prices),
         # buy_bit(prices),
@@ -190,8 +137,8 @@ async def compare_loop():
     last_dbg = 0
     while True:
         common_pairs = (
-                set(prices["okx"].keys())
-                & set(prices["okx_perp"].keys())
+                #set(prices["okx"].keys())
+                set(prices["okx_perp"].keys())
                 # & set(prices["kucoin"].keys())
                 # & set(prices["kucoin_perp"].keys())
                 # & set(prices["buy_bit"].keys())
@@ -204,7 +151,7 @@ async def compare_loop():
 
         for pair in common_pairs:
             #print(pair)
-            okx = prices["okx"][pair]
+            #okx = prices["okx"][pair]
             okx_perp = prices["okx_perp"][pair]
             # kuc = prices["kucoin"][pair]
             # kuc_perp = prices["kucoin_perp"][pair]
@@ -227,8 +174,8 @@ async def compare_loop():
                 print(f'bitget {bitget}')
                 last_dbg = time.time()
             # есть ли все котировки
-            if (okx["ask"] is not None and okx["bid"] is not None
-                    and okx_perp["ask"] is not None and okx_perp["bid"] is not None
+            if (#okx["ask"] is not None and okx["bid"] is not None
+                    okx_perp["ask"] is not None and okx_perp["bid"] is not None
                     # and kuc["ask"] is not None and kuc["bid"] is not None
                     # and kuc_perp["ask"] is not None and kuc_perp["bid"] is not None
                     # and buy_bit["ask"] is not None  and buy_bit["bid"] is not None
@@ -240,13 +187,12 @@ async def compare_loop():
 
                 now_ms = int(time.time() * 1000)
                 current_time = time.strftime("%H:%M:%S")
-
                 # свежие ли данные
 
                 # if ((now_ms - okx["ts"] <= TTL_MS) and (now_ms - okx_perp["ts"] <= TTL_MS) and (now_ms - kuc["ts"] <= TTL_MS) and  (now_ms - kuc_perp["ts"] <= TTL_MS)
                 #         and (now_ms - buy_bit["ts"] <= TTL_MS) and (now_ms - gate_perp["ts"] <= TTL_MS) and (now_ms - mecx["ts"] <= TTL_MS) and (now_ms - gate["ts"] <= TTL_MS)
                 #         and (now_ms - bitgate_perp["ts"] <= TTL_MS)):
-                if ((now_ms - okx["ts"] <= TTL_MS) and (now_ms - okx_perp["ts"] <= TTL_MS) and (now_ms - bitget_perp["ts"] <= TTL_MS) and (now_ms - bitget["ts"] <= TTL_MS)):
+                if ((now_ms - okx_perp["ts"] <= TTL_MS) and (now_ms - bitget_perp["ts"] <= TTL_MS) and (now_ms - bitget["ts"] <= TTL_MS)):
 
                     # Направление 1: BUY OKX (ask) -> SELL KuCoin_perp (bid)
                     # buy = okx["ask"]  # лучшая цена продажи
@@ -387,17 +333,18 @@ async def compare_loop():
                     #         write_to_arbitrage(buy, sell, spread, need_base, current_time, pair,
                     #                         'Направление 12 PERP: BUY Gate (ask) -> SELL Gate_perp (bid)')
                     #
-                    # Направление 13: BUY OKX (ask) -> SELL Bitgate_perp (bid)
-                    buy = okx["ask"]  # лучшая цена продажи
-                    sell = bitget_perp["bid"]  # лучшая цена покупки
-                    need_base = USDT_AMOUNT / buy
-
-                    if okx["ask_qty"] >= need_base and bitget_perp["bid_qty"] >= need_base:
-                        spread = (sell - buy) / buy  # пред, разница между биржами
-                        if spread >= MIN_SPREAD:
-                            # print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
-                            write_to_arbitrage(buy, sell, spread, need_base, current_time, pair, 'Направление 1 PERP: BUY OKX (ask) -> SELL BITGET_perp (bid)')
+                    # # Направление 13: BUY OKX (ask) -> SELL Bitgate_perp (bid)
+                    # buy = okx["ask"]  # лучшая цена продажи
+                    # sell = bitget_perp["bid"]  # лучшая цена покупки
+                    # need_base = USDT_AMOUNT / buy
                     #
+                    # if okx["ask_qty"] >= need_base and bitget_perp["bid_qty"] >= need_base:
+                    #     spread = (sell - buy) / buy  # пред, разница между биржами
+                    #     print(spread)
+                    #     if spread <= MIN_SPREAD:
+                    #         # print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
+                    #         write_to_arbitrage(buy, sell, spread, need_base, current_time, pair, 'Направление 1 PERP: BUY OKX (ask) -> SELL BITGET_perp (bid)')
+                    # #
                     # # Направление 14: BUY Kucoin (ask) -> SELL Bitgate_perp (bid)
                     # buy = kuc["ask"]  # лучшая цена продажи
                     # sell = bitgate_perp["bid"]  # лучшая цена покупки
@@ -418,12 +365,21 @@ async def compare_loop():
                     #     if spread >= MIN_SPREAD:
                     #         write_to_arbitrage(buy, sell, spread, need_base, current_time, pair, 'Направление 15 PERP: BUY Buybit (ask) -> SELL Bitgate_perp (bid)')
 
+                    # Направление 1: BUY BITGET (ask) -> SELL OKX_perp (bid)
+                    buy = bitget["ask"]  # лучшая цена продажи
+                    sell = okx_perp["bid"]  # лучшая цена покупки
+                    need_base = USDT_AMOUNT / buy
+
                     if bitget["ask_qty"] >= need_base and okx_perp["bid_qty"] >= need_base:
                         spread = (sell - buy) / buy  # пред, разница между биржами
                         if spread >= MIN_SPREAD:
                             # print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
-                            write_to_arbitrage(buy, sell, spread, need_base, current_time, pair, 'Направление 2 PERP: BUY BITGET (ask) -> SELL OKX_perp (bid)')
+                            write_to_arbitrage(buy, sell, spread, need_base, current_time, pair, 'Направление 1 PERP: BUY BITGET (ask) -> SELL OKX_perp (bid)')
 
+                    # Направление 2: PERP: BUY BITGET (ask) -> SELL BITGET_perp
+                    buy = bitget["ask"]  # лучшая цена продажи
+                    sell = bitget_perp["bid"]  # лучшая цена покупки
+                    need_base = USDT_AMOUNT / buy
 
                     if bitget["ask_qty"] >= need_base and bitget_perp["bid_qty"] >= need_base:
                         spread = (sell - buy) / buy  # пред, разница между биржами
@@ -431,11 +387,6 @@ async def compare_loop():
                             # print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
                             write_to_arbitrage(buy, sell, spread, need_base, current_time, pair, 'Направление 3 PERP: BUY BITGET (ask) -> SELL BITGET_perp (bid)')
 
-                    if okx["ask_qty"] >= need_base and okx_perp["bid_qty"] >= need_base:
-                        spread = (sell - buy) / buy  # пред, разница между биржами
-                        if spread >= MIN_SPREAD:
-                            # print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
-                            write_to_arbitrage(buy, sell, spread, need_base, current_time, pair, 'Направление 4 PERP: BUY OKX (ask) -> SELL OKX_perp (bid)')
 
 ########################################################################################################################
                     # # Направление 1: BUY OKX (ask) -> SELL KuCoin (bid)

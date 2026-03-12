@@ -1,12 +1,13 @@
 import asyncio, json, time, requests, websockets
 from asyncio.exceptions import CancelledError
-
+from exel import sheet2
 
 # WEBSOKET OKX#############################################
 
 async def okx_perp(prices):
     url = "wss://ws.okx.com:8443/ws/v5/public"
-    INSTS = ["LAB-USDT-SWAP", "KGEN-USDT-SWAP", "APR-USDT-SWAP", "RLS-USDT-SWAP", "COAI-USDT-SWAP"]
+    #INSTS = ["LAB-USDT-SWAP", "KGEN-USDT-SWAP", "APR-USDT-SWAP", "RLS-USDT-SWAP", "COAI-USDT-SWAP"]
+    INSTS = sheet2.col_values(1)[1:]
     while True:
         try:
             async with websockets.connect(url, ping_interval=20, ping_timeout=20) as ws:
@@ -24,7 +25,7 @@ async def okx_perp(prices):
                     if "data" not in inform or not inform["data"]:
                         continue
 
-                    instId = inform["arg"]['instId'].replace("-SWAP", "")
+                    instId = inform["arg"]['instId']
                     data = inform["data"][0]
                     ask = float(data["asks"][0][0])
                     bid = float(data["bids"][0][0])

@@ -2,7 +2,7 @@ import asyncio
 import json
 import websockets
 from asyncio.exceptions import CancelledError
-
+from exel import sheet2
 
 async def bitget_ping(ws):
     try:
@@ -15,7 +15,10 @@ async def bitget_ping(ws):
 
 async def bitget_perp(prices):
     url = "wss://ws.bitget.com/v2/ws/public"
-    INSTS = ["LABUSDT", "KGENUSDT", "RLSUSDT", "APRUSDT", "COAIUSDT"]
+    INSTS = []
+    INSTS_SWAP = sheet2.col_values(1)[1:]
+    for INST in INSTS_SWAP:
+        INSTS.append(INST.replace("-USDT-SWAP", "USDT"))
 
     while True:
         ping_task = None
@@ -49,7 +52,7 @@ async def bitget_perp(prices):
                     if "data" not in inform or not inform["data"]:
                         continue
 
-                    instId = inform["arg"]["instId"].replace("USDT", "-USDT")
+                    instId = inform["arg"]["instId"].replace("USDT", "-USDT-SWAP")
                     data = inform["data"][0]
 
                     ask = float(data["asks"][0][0])

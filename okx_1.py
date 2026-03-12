@@ -1,12 +1,16 @@
 import asyncio, json, time, requests, websockets
 from asyncio.exceptions import CancelledError
-
+from exel import sheet2
 
 # WEBSOKET OKX#############################################
 
 async def okx(prices):
     url = "wss://ws.okx.com:8443/ws/v5/public"
-    INSTS = ["LAB-USDT", "KGEN-USDT", "APR-USDT", "RLS-USDT", "COAI-USDT"]
+    #INSTS = ["LAB-USDT", "KGEN-USDT", "APR-USDT", "RLS-USDT", "COAI-USDT"]
+    INSTS = []
+    INSTS_SWAP = sheet2.col_values(1)[1:]
+    for INST in INSTS_SWAP:
+        INSTS.append(INST.replace("-USDT-SWAP", "-USDT"))
     while True:
         try:
             async with websockets.connect(url, ping_interval=20, ping_timeout=20) as ws:
@@ -24,7 +28,7 @@ async def okx(prices):
                     if "data" not in inform or not inform["data"]:
                         continue
 
-                    instId = inform["arg"]['instId']
+                    instId = inform["arg"]['instId'].replace("-USDT", "-USDT-SWAP")
                     data = inform["data"][0]
                     ask = float(data["asks"][0][0])
                     bid = float(data["bids"][0][0])
@@ -38,6 +42,7 @@ async def okx(prices):
                         "bid_qty": volume_bid,
                         "ts": int(data["ts"])  # OKX ts уже в мс строкой
                     }
+                    print(prices)
 
         except CancelledError as e:
             print('Interrupted by user')

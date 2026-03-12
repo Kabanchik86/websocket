@@ -1,12 +1,16 @@
 import asyncio, json, time, requests, websockets
 from asyncio.exceptions import CancelledError
-
+from exel import sheet2
 
 # WEBSOKET BITGATE#############################################
 
+
 async def bitget():
     url = "	wss://ws.bitget.com/v2/ws/public"
-    INSTS = ["LABUSDT", "KGENUSDT", "RLSUSDT", "APRUSDT", "COAIUSDT"]
+    INSTS = []
+    INSTS_SWAP = sheet2.col_values(1)[1:]
+    for INST in INSTS_SWAP:
+        INSTS.append(INST.replace("-USDT-SWAP","USDT"))
     while True:
         try:
             async with websockets.connect(url, ping_interval=20, ping_timeout=20) as ws:

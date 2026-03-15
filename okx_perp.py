@@ -38,7 +38,9 @@ async def okx_perp(prices):
                         "bid": bid,
                         "ask_qty": volume_ask,
                         "bid_qty": volume_bid,
-                        "ts": int(data["ts"])
+                        "ts": int(data["ts"]),
+                        "local_ts": int(time.time()*1000)
+
                     }
 
         except CancelledError as e:

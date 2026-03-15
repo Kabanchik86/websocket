@@ -2,6 +2,7 @@ import asyncio, json, time, requests, websockets
 from asyncio.exceptions import CancelledError
 from exel import sheet2
 
+
 # WEBSOKET OKX#############################################
 
 async def okx(prices):
@@ -40,7 +41,8 @@ async def okx(prices):
                         "bid": bid,
                         "ask_qty": volume_ask,
                         "bid_qty": volume_bid,
-                        "ts": int(data["ts"])  # OKX ts уже в мс строкой
+                        "ts": int(data["ts"]),  # OKX ts уже в мс строкой
+                        "local_ts": int(time.time() * 1000)
                     }
                     print(prices)
 

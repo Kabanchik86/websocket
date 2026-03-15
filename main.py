@@ -5,12 +5,15 @@ from bitget_perp import bitget_perp
 from bitget_spot import bitget
 from exel import sheet2
 
+
 INSTS = sheet2.col_values(1)[1:]
+arbitrage_queue = asyncio.Queue(maxsize=1000)
+last_signal_time = {}
 
 prices = {
-    # "okx": {inst: {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None}
+    # "okx": {inst: {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None, "local_ts": None}
     #     for inst in INSTS},
-    "okx_perp": {inst: {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None}
+    "okx_perp": {inst: {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None, "local_ts": None}
         for inst in INSTS},
     "kucoin": {'TON-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
                'SUI-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
@@ -108,9 +111,9 @@ prices = {
             'JUP-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
             'PENGU-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None}
          },
-    "bitget_perp": {inst: {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None}
+    "bitget_perp": {inst: {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None, "local_ts": None}
         for inst in INSTS},
-    "bitget": {inst: {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None}
+    "bitget": {inst: {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None, "local_ts": None}
         for inst in INSTS},
 }
 
@@ -126,73 +129,111 @@ async def main():
         # gate(prices),
         bitget_perp(prices),
         bitget(prices),
+        writer_worker(),
         compare_loop()
     )
+
+def is_fresh(book: dict, TTL_MS: int) -> bool:
+    if book["local_ts"] is None:
+        return False
+    now_ms = int(time.time() * 1000)
+    return (now_ms - book["local_ts"]) <= TTL_MS
+
+
+async def writer_worker(): # фуекция записи в эксель
+    while True:
+        row = await arbitrage_queue.get()
+
+        try:
+            await asyncio.to_thread(write_to_arbitrage, *row)
+        except Exception as e:
+            print(f"[WRITE ERROR] {e}")
+        finally:
+            arbitrage_queue.task_done()
+
+def can_emit_signal(signal_key: str, cooldown_sec: float = 0.5) -> bool: # функция проверки сигнала
+    now = time.time()
+    last_ts = last_signal_time.get(signal_key, 0)
+
+    if now - last_ts >= cooldown_sec:
+        last_signal_time[signal_key] = now
+        return True
+
+    return False
 
 
 async def compare_loop():
     USDT_AMOUNT = 10  # 10$
     MIN_SPREAD = 0.005  # 0.5% для старта
-    TTL_MS = 10000  # котировка считается свежей 10 сек
+    TTL_MS = 500  # котировка считается свежей 0.5 сек
     last_dbg = 0
+    common_pairs = (
+        # set(prices["okx"].keys())
+            set(prices["okx_perp"].keys())
+            # & set(prices["kucoin"].keys())
+            # & set(prices["kucoin_perp"].keys())
+            # & set(prices["buy_bit"].keys())
+            # & set(prices["gate_perp"].keys())
+            # & set(prices["mecx"].keys())
+            # & set(prices["gate"].keys())
+            & set(prices["bitget_perp"].keys())
+            & set(prices["bitget"].keys())
+    )
     while True:
-        common_pairs = (
-                #set(prices["okx"].keys())
-                set(prices["okx_perp"].keys())
-                # & set(prices["kucoin"].keys())
-                # & set(prices["kucoin_perp"].keys())
-                # & set(prices["buy_bit"].keys())
-                # & set(prices["gate_perp"].keys())
-                # & set(prices["mecx"].keys())
-                # & set(prices["gate"].keys())
-                & set(prices["bitget_perp"].keys())
-                & set(prices["bitget"].keys())
-        )
-
         for pair in common_pairs:
             #print(pair)
             #okx = prices["okx"][pair]
-            okx_perp = prices["okx_perp"][pair]
+            okx_perp_book = prices["okx_perp"][pair]
             # kuc = prices["kucoin"][pair]
             # kuc_perp = prices["kucoin_perp"][pair]
             # buy_bit = prices["buy_bit"][pair]
             # gate_perp = prices["gate_perp"][pair]
             # gate = prices["gate"][pair]
             # mecx = prices["mecx"][pair]
-            bitget_perp = prices["bitget_perp"][pair]
-            bitget = prices["bitget"][pair]
+            bitget_perp_book = prices["bitget_perp"][pair]
+            bitget_book = prices["bitget"][pair]
+
             if time.time() - last_dbg > 2:
-                #print(f'okx {okx}')
-                print(f'okx_perp {okx_perp}')
-                # print(f'kuc {kuc}')
-                # print(f'kuc_perp {kuc_perp}')
-                # print(f'buy_bit {buy_bit}')
-                # print(f'gate_perp {gate_perp}')
-                # print(f'gate {gate}')
-                # print(f'mecx {mecx}')
-                print(f'bitget_perp {bitget_perp}')
-                print(f'bitget {bitget}')
+                print(f"\nPAIR: {pair}")
+
+                print("okx_perp:",
+                      "ask=", okx_perp_book["ask"],
+                      "bid=", okx_perp_book["bid"],
+                      "local_ts=", okx_perp_book["local_ts"])
+
+                print("bitget_perp:",
+                      "ask=", bitget_perp_book["ask"],
+                      "bid=", bitget_perp_book["bid"],
+                      "local_ts=", bitget_perp_book["local_ts"])
+
+                print("bitget_spot:",
+                      "ask=", bitget_book["ask"],
+                      "bid=", bitget_book["bid"],
+                      "local_ts=", bitget_book["local_ts"])
                 last_dbg = time.time()
             # есть ли все котировки
             if (#okx["ask"] is not None and okx["bid"] is not None
-                    okx_perp["ask"] is not None and okx_perp["bid"] is not None
+                    okx_perp_book["ask"] is not None and okx_perp_book["bid"] is not None
                     # and kuc["ask"] is not None and kuc["bid"] is not None
                     # and kuc_perp["ask"] is not None and kuc_perp["bid"] is not None
                     # and buy_bit["ask"] is not None  and buy_bit["bid"] is not None
                     # and mecx["ask"] is not None and mecx["bid"] is not None
                     # and gate_perp["ask"] is not None and gate_perp["bid"] is not None
                     # and gate["ask"] is not None and gate["bid"] is not None
-                    and bitget_perp["ask"] is not None and bitget_perp["bid"] is not None
-                    and bitget["ask"] is not None and bitget["bid"] is not None):
+                    and bitget_perp_book["ask"] is not None and bitget_perp_book["bid"] is not None
+                    and bitget_book["ask"] is not None and bitget_book["bid"] is not None):
 
-                now_ms = int(time.time() * 1000)
                 current_time = time.strftime("%H:%M:%S")
                 # свежие ли данные
 
                 # if ((now_ms - okx["ts"] <= TTL_MS) and (now_ms - okx_perp["ts"] <= TTL_MS) and (now_ms - kuc["ts"] <= TTL_MS) and  (now_ms - kuc_perp["ts"] <= TTL_MS)
                 #         and (now_ms - buy_bit["ts"] <= TTL_MS) and (now_ms - gate_perp["ts"] <= TTL_MS) and (now_ms - mecx["ts"] <= TTL_MS) and (now_ms - gate["ts"] <= TTL_MS)
                 #         and (now_ms - bitgate_perp["ts"] <= TTL_MS)):
-                if ((now_ms - okx_perp["ts"] <= TTL_MS) and (now_ms - bitget_perp["ts"] <= TTL_MS) and (now_ms - bitget["ts"] <= TTL_MS)):
+                if (
+                        is_fresh(okx_perp_book, TTL_MS)
+                        and is_fresh(bitget_perp_book, TTL_MS)
+                        and is_fresh(bitget_book, TTL_MS)
+                ):
 
                     # Направление 1: BUY OKX (ask) -> SELL KuCoin_perp (bid)
                     # buy = okx["ask"]  # лучшая цена продажи
@@ -366,26 +407,47 @@ async def compare_loop():
                     #         write_to_arbitrage(buy, sell, spread, need_base, current_time, pair, 'Направление 15 PERP: BUY Buybit (ask) -> SELL Bitgate_perp (bid)')
 
                     # Направление 1: BUY BITGET (ask) -> SELL OKX_perp (bid)
-                    buy = bitget["ask"]  # лучшая цена продажи
-                    sell = okx_perp["bid"]  # лучшая цена покупки
+
+
+                    # Направление 1 PERP: BUY BITGET (ask) -> SELL OKX_perp (bid)'
+                    buy = bitget_book["ask"]  # лучшая цена продажи
+                    sell = okx_perp_book["bid"]  # лучшая цена покупки
                     need_base = USDT_AMOUNT / buy
 
-                    if bitget["ask_qty"] >= need_base and okx_perp["bid_qty"] >= need_base:
+                    if bitget_book["ask_qty"] >= need_base and okx_perp_book["bid_qty"] >= need_base:
                         spread = (sell - buy) / buy  # пред, разница между биржами
-                        if spread >= MIN_SPREAD:
-                            # print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
-                            write_to_arbitrage(buy, sell, spread, need_base, current_time, pair, 'Направление 1 PERP: BUY BITGET (ask) -> SELL OKX_perp (bid)')
+                        if spread <= MIN_SPREAD:
+                            signal_key = f"{pair}|BITGET->OKX_PERP"
+                            if can_emit_signal(signal_key, cooldown_sec=1.0):
+                            #print(buy, sell, spread, need_base, current_time, pair, 'Направление 1 PERP: BUY BITGET (ask) -> SELL OKX_perp (bid)')
+                            #write_to_arbitrage(buy, sell, spread, need_base, current_time, pair, 'Направление 1 PERP: BUY BITGET (ask) -> SELL OKX_perp (bid)')
+                                try:
+                                    arbitrage_queue.put_nowait([
+                                        buy, sell, spread, need_base, current_time, pair,
+                                        'Направление 1 PERP: BUY BITGET (ask) -> SELL OKX_perp (bid)'
+                                    ])
+                                except asyncio.QueueFull:
+                                    pass
 
                     # Направление 2: PERP: BUY BITGET (ask) -> SELL BITGET_perp
-                    buy = bitget["ask"]  # лучшая цена продажи
-                    sell = bitget_perp["bid"]  # лучшая цена покупки
+                    buy = bitget_book["ask"]  # лучшая цена продажи
+                    sell = bitget_perp_book["bid"]  # лучшая цена покупки
                     need_base = USDT_AMOUNT / buy
 
-                    if bitget["ask_qty"] >= need_base and bitget_perp["bid_qty"] >= need_base:
+                    if bitget_book["ask_qty"] >= need_base and bitget_perp_book["bid_qty"] >= need_base:
                         spread = (sell - buy) / buy  # пред, разница между биржами
                         if spread >= MIN_SPREAD:
+                            signal_key = f"{pair}|BITGET->BITGET_PERP"
+                            if can_emit_signal(signal_key, cooldown_sec=1.0):
                             # print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
-                            write_to_arbitrage(buy, sell, spread, need_base, current_time, pair, 'Направление 3 PERP: BUY BITGET (ask) -> SELL BITGET_perp (bid)')
+                            #write_to_arbitrage(buy, sell, spread, need_base, current_time, pair, 'Направление 2 PERP: BUY BITGET (ask) -> SELL BITGET_perp (bid)')
+                                try:
+                                    arbitrage_queue.put_nowait([
+                                        buy, sell, spread, need_base, current_time, pair,
+                                        'Направление 2 PERP: BUY BITGET (ask) -> SELL BITGET_perp (bid)'
+                                    ])
+                                except asyncio.QueueFull:
+                                    pass
 
 
 ########################################################################################################################
@@ -489,7 +551,7 @@ async def compare_loop():
 
 
 
-        await asyncio.sleep(0.2)  # 200 мс
+        await asyncio.sleep(0.01)  # 10 мс
 
 
 if __name__ == '__main__':

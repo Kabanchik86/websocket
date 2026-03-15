@@ -3,6 +3,7 @@ import json
 import websockets
 from asyncio.exceptions import CancelledError
 from exel import sheet2
+import time
 
 async def bitget_ping(ws):
     try:
@@ -65,7 +66,8 @@ async def bitget(prices):
                         "bid": bid,
                         "ask_qty": volume_ask,
                         "bid_qty": volume_bid,
-                        "ts": int(data["ts"])
+                        "ts": int(data["ts"]),
+                        "local_ts": int(time.time() * 1000)
                     }
 
         except CancelledError:

@@ -151,7 +151,7 @@ async def writer_worker(): # фуекция записи в эксель
         finally:
             arbitrage_queue.task_done()
 
-def can_emit_signal(signal_key: str, cooldown_sec: float = 0.2) -> bool: # функция проверки сигнала
+def can_emit_signal(signal_key: str, cooldown_sec: float = 0) -> bool: # функция проверки сигнала
     now = time.time()
     last_ts = last_signal_time.get(signal_key, 0)
 
@@ -418,7 +418,7 @@ async def compare_loop():
                         spread = (sell - buy) / buy  # спред, разница между биржами
                         if spread >= MIN_SPREAD:
                             signal_key = f"{pair}|BITGET->OKX_PERP"
-                            if can_emit_signal(signal_key, cooldown_sec=0.2):
+                            if can_emit_signal(signal_key, cooldown_sec=0):
                             #print(buy, sell, spread, need_base, current_time, pair, 'Направление 1 PERP: BUY BITGET (ask) -> SELL OKX_perp (bid)')
                             #write_to_arbitrage(buy, sell, spread, need_base, current_time, pair, 'Направление 1 PERP: BUY BITGET (ask) -> SELL OKX_perp (bid)')
                                 try:

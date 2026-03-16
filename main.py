@@ -1,9 +1,9 @@
 import asyncio, time
 from exel import write_to_arbitrage
 from okx_perp import okx_perp
-from bitget_perp import bitget_perp
 from bitget_spot import bitget
 from exel import sheet2
+from datetime import datetime
 
 
 INSTS = sheet2.col_values(1)[1:]
@@ -111,8 +111,8 @@ prices = {
             'JUP-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None},
             'PENGU-USDT': {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None}
          },
-    "bitget_perp": {inst: {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None, "local_ts": None}
-        for inst in INSTS},
+    # "bitget_perp": {inst: {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None, "local_ts": None}
+    #     for inst in INSTS},
     "bitget": {inst: {"ask": None, "bid": None, "ask_qty": None, "bid_qty": None, "ts": None, "local_ts": None}
         for inst in INSTS},
 }
@@ -127,7 +127,7 @@ async def main():
         # mecx(prices),
         # kucoin_perp(prices),
         # gate(prices),
-        bitget_perp(prices),
+        #bitget_perp(prices),
         bitget(prices),
         writer_worker(),
         compare_loop()
@@ -151,7 +151,7 @@ async def writer_worker(): # фуекция записи в эксель
         finally:
             arbitrage_queue.task_done()
 
-def can_emit_signal(signal_key: str, cooldown_sec: float = 0.5) -> bool: # функция проверки сигнала
+def can_emit_signal(signal_key: str, cooldown_sec: float = 0.2) -> bool: # функция проверки сигнала
     now = time.time()
     last_ts = last_signal_time.get(signal_key, 0)
 
@@ -163,9 +163,9 @@ def can_emit_signal(signal_key: str, cooldown_sec: float = 0.5) -> bool: # фу�
 
 
 async def compare_loop():
-    USDT_AMOUNT = 10  # 10$
+    USDT_AMOUNT = 20  # 20$
     MIN_SPREAD = 0.005  # 0.5% для старта
-    TTL_MS = 500  # котировка считается свежей 0.5 сек
+    TTL_MS = 300  # котировка считается свежей 0.3 сек
     last_dbg = 0
     common_pairs = (
         # set(prices["okx"].keys())
@@ -176,7 +176,7 @@ async def compare_loop():
             # & set(prices["gate_perp"].keys())
             # & set(prices["mecx"].keys())
             # & set(prices["gate"].keys())
-            & set(prices["bitget_perp"].keys())
+            #& set(prices["bitget_perp"].keys())
             & set(prices["bitget"].keys())
     )
     while True:
@@ -190,7 +190,7 @@ async def compare_loop():
             # gate_perp = prices["gate_perp"][pair]
             # gate = prices["gate"][pair]
             # mecx = prices["mecx"][pair]
-            bitget_perp_book = prices["bitget_perp"][pair]
+            #bitget_perp_book = prices["bitget_perp"][pair]
             bitget_book = prices["bitget"][pair]
 
             if time.time() - last_dbg > 2:
@@ -201,10 +201,10 @@ async def compare_loop():
                       "bid=", okx_perp_book["bid"],
                       "local_ts=", okx_perp_book["local_ts"])
 
-                print("bitget_perp:",
-                      "ask=", bitget_perp_book["ask"],
-                      "bid=", bitget_perp_book["bid"],
-                      "local_ts=", bitget_perp_book["local_ts"])
+                # print("bitget_perp:",
+                #       "ask=", bitget_perp_book["ask"],
+                #       "bid=", bitget_perp_book["bid"],
+                #       "local_ts=", bitget_perp_book["local_ts"])
 
                 print("bitget_spot:",
                       "ask=", bitget_book["ask"],
@@ -220,10 +220,10 @@ async def compare_loop():
                     # and mecx["ask"] is not None and mecx["bid"] is not None
                     # and gate_perp["ask"] is not None and gate_perp["bid"] is not None
                     # and gate["ask"] is not None and gate["bid"] is not None
-                    and bitget_perp_book["ask"] is not None and bitget_perp_book["bid"] is not None
+                    #and bitget_perp_book["ask"] is not None and bitget_perp_book["bid"] is not None
                     and bitget_book["ask"] is not None and bitget_book["bid"] is not None):
 
-                current_time = time.strftime("%H:%M:%S")
+                current_time = datetime.now().strftime("%H:%M:%S.%f")[:-3]
                 # свежие ли данные
 
                 # if ((now_ms - okx["ts"] <= TTL_MS) and (now_ms - okx_perp["ts"] <= TTL_MS) and (now_ms - kuc["ts"] <= TTL_MS) and  (now_ms - kuc_perp["ts"] <= TTL_MS)
@@ -231,7 +231,7 @@ async def compare_loop():
                 #         and (now_ms - bitgate_perp["ts"] <= TTL_MS)):
                 if (
                         is_fresh(okx_perp_book, TTL_MS)
-                        and is_fresh(bitget_perp_book, TTL_MS)
+                        #and is_fresh(bitget_perp_book, TTL_MS)
                         and is_fresh(bitget_book, TTL_MS)
                 ):
 
@@ -415,10 +415,10 @@ async def compare_loop():
                     need_base = USDT_AMOUNT / buy
 
                     if bitget_book["ask_qty"] >= need_base and okx_perp_book["bid_qty"] >= need_base:
-                        spread = (sell - buy) / buy  # пред, разница между биржами
+                        spread = (sell - buy) / buy  # спред, разница между биржами
                         if spread >= MIN_SPREAD:
                             signal_key = f"{pair}|BITGET->OKX_PERP"
-                            if can_emit_signal(signal_key, cooldown_sec=1.0):
+                            if can_emit_signal(signal_key, cooldown_sec=0.2):
                             #print(buy, sell, spread, need_base, current_time, pair, 'Направление 1 PERP: BUY BITGET (ask) -> SELL OKX_perp (bid)')
                             #write_to_arbitrage(buy, sell, spread, need_base, current_time, pair, 'Направление 1 PERP: BUY BITGET (ask) -> SELL OKX_perp (bid)')
                                 try:
@@ -430,24 +430,24 @@ async def compare_loop():
                                     pass
 
                     # Направление 2: PERP: BUY BITGET (ask) -> SELL BITGET_perp
-                    buy = bitget_book["ask"]  # лучшая цена продажи
-                    sell = bitget_perp_book["bid"]  # лучшая цена покупки
-                    need_base = USDT_AMOUNT / buy
-
-                    if bitget_book["ask_qty"] >= need_base and bitget_perp_book["bid_qty"] >= need_base:
-                        spread = (sell - buy) / buy  # пред, разница между биржами
-                        if spread >= MIN_SPREAD:
-                            signal_key = f"{pair}|BITGET->BITGET_PERP"
-                            if can_emit_signal(signal_key, cooldown_sec=1.0):
-                            # print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
-                            #write_to_arbitrage(buy, sell, spread, need_base, current_time, pair, 'Направление 2 PERP: BUY BITGET (ask) -> SELL BITGET_perp (bid)')
-                                try:
-                                    arbitrage_queue.put_nowait([
-                                        buy, sell, spread, need_base, current_time, pair,
-                                        'Направление 2 PERP: BUY BITGET (ask) -> SELL BITGET_perp (bid)'
-                                    ])
-                                except asyncio.QueueFull:
-                                    pass
+                    # buy = bitget_book["ask"]  # лучшая цена продажи
+                    # sell = bitget_perp_book["bid"]  # лучшая цена покупки
+                    # need_base = USDT_AMOUNT / buy
+                    #
+                    # if bitget_book["ask_qty"] >= need_base and bitget_perp_book["bid_qty"] >= need_base:
+                    #     spread = (sell - buy) / buy  # пред, разница между биржами
+                    #     if spread >= MIN_SPREAD:
+                    #         signal_key = f"{pair}|BITGET->BITGET_PERP"
+                    #         if can_emit_signal(signal_key, cooldown_sec=1.0):
+                    #         # print(f"[ARB] BUY OKX @{buy} -> SELL KUCOIN @{sell} | {spread*100:.2f}% | need {need_base:.4f} TON")
+                    #         #write_to_arbitrage(buy, sell, spread, need_base, current_time, pair, 'Направление 2 PERP: BUY BITGET (ask) -> SELL BITGET_perp (bid)')
+                    #             try:
+                    #                 arbitrage_queue.put_nowait([
+                    #                     buy, sell, spread, need_base, current_time, pair,
+                    #                     'Направление 2 PERP: BUY BITGET (ask) -> SELL BITGET_perp (bid)'
+                    #                 ])
+                    #             except asyncio.QueueFull:
+                    #                 pass
 
 
 ########################################################################################################################

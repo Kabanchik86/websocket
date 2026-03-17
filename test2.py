@@ -15,7 +15,7 @@ async def okx_perp():
                 # Сообщение для подписки
                 subscribe_msg = {
                     "op": "subscribe",
-                    "args": [{"channel": "books5", "instId": inst} for inst in INSTS]
+                    "args": [{"channel": "bbo-tbt", "instId": inst} for inst in INSTS]
                 }
                 await ws.send(json.dumps(subscribe_msg))
                 async for msg in ws:

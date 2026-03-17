@@ -30,7 +30,7 @@ async def bitget(prices):
                 subscribe_msg = {
                     "op": "subscribe",
                     "args": [
-                        {"instType": "SPOT", "channel": "books5", "instId": inst}
+                        {"instType": "SPOT", "channel": "books1", "instId": inst}
                         for inst in INSTS
                     ]
                 }

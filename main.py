@@ -57,7 +57,7 @@ def can_emit_signal(now_ms: int, signal_key: str, cooldown_sec: float = 0) -> bo
 async def compare_loop():
     USDT_AMOUNT = 20  # 20$
     MIN_SPREAD = 0.0035  # 0.5% для старта
-    TTL_MS = 150  # котировка считается свежей 1,5 сек
+    TTL_MS = 200  # котировка считается свежей 1,5 сек
     last_dbg = 0
     common_pairs = (
         # set(prices["okx"].keys())
@@ -115,7 +115,7 @@ async def compare_loop():
                             #write_to_arbitrage(buy, sell, spread, need_base, current_time, pair, 'Направление 1 PERP: BUY BITGET (ask) -> SELL OKX_perp (bid)')
                                 try:
                                     arbitrage_queue.put_nowait([
-                                        buy, sell, spread, need_base, current_time, pair, now_ms, bitget_book["local_ts"], okx_perp_book["local_ts"],
+                                        buy, sell, spread, need_base, bitget_book["ask_qty"], okx_perp_book["bid_qty"], current_time, pair, now_ms, bitget_book["local_ts"], okx_perp_book["local_ts"],
                                         'Направление 1 PERP: BUY BITGET (ask) -> SELL OKX_perp (bid)'
                                     ])
                                 except asyncio.QueueFull:

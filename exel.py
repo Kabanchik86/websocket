@@ -56,6 +56,6 @@ def write_to_arbitrage(buy, sell, spread, need_base, volume_ask, volume_bid, cur
     row = len(col_a) + 1
 
     sheet5.update(
-        f"A{row}:J{row}",
+        f"A{row}:L{row}",
         [[buy, sell, spread, need_base, volume_ask, volume_bid, current_time, pair, now_ms, bitget_book, okx_perp_book, direction]]
     )

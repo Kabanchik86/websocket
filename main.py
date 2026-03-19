@@ -108,7 +108,7 @@ async def compare_loop():
 
                     if bitget_book["ask_qty"] >= need_base and okx_perp_book["bid_qty"] >= need_base:
                         spread = (sell - buy) / buy  # спред, разница между биржами
-                        if spread >= MIN_SPREAD:
+                        if spread <= MIN_SPREAD:
                             #print(pair, now_ms, bitget_book["local_ts"], okx_perp_book["local_ts"])
                             signal_key = f"{pair}|BITGET->OKX_PERP"
                             if can_emit_signal(now_ms, signal_key, cooldown_sec=0):

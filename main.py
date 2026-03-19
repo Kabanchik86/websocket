@@ -57,7 +57,7 @@ def can_emit_signal(now_ms: int, signal_key: str, cooldown_sec: float = 0) -> bo
 async def compare_loop():
     USDT_AMOUNT = 20  # 20$
     MIN_SPREAD = 0.0035  # 0.5% для старта
-    TTL_MS = 80  # котировка считается свежей 0.5 сек
+    TTL_MS = 150  # котировка считается свежей 1,5 сек
     last_dbg = 0
     common_pairs = (
         # set(prices["okx"].keys())
